@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢乐摇一摇</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <link href="css/common.css" rel="stylesheet"/>
+    <link href="css/index.css" rel="stylesheet"/>
+    <link href="css/iconfont.css" rel="stylesheet"/>
+</head>
+<body class="bg-shake">
+    <audio style="display: none;" id="musicBox" preload="metadata" src="audio/shake_sound_male.mp3"></audio>
+    <div class="container">
+        <div class="shake-container">
+            <div class="outter-circle">
+                <div class="inner-circle">
+                    <span class="shake-font shake-band"></span>
+                </div>
+            </div>
+        </div>
+        <div class="win">
+            <div class="awards">
+                特等奖
+            </div>
+            <div class="not-awards">
+                未中奖
+            </div>
+        </div>
+    </div>
+
+
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="js/shake.js"></script>
+    <script>
+//        var ouuterWidth = $(".outter-circle").css("width");
+//        $(".outter-circle").css("height", ouuterWidth);
+        var SHAKE_THRESHOLD = 100;
+        var last_update = curTime = new Date().getTime();
+        var x = y = z = last_x = last_y = last_z = 0;
+        init();
+        function init() {
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', deviceMotionHandler, false);
+            } else {
+                alert('not support mobile event');
+            }
+        }
+        function deviceMotionHandler(eventData) {
+            curTime = new Date().getTime();
+            var diffTime = curTime - last_update;
+            if(diffTime > 1500) {
+                diffTime = 1500;
+                var acceleration = eventData.accelerationIncludingGravity;
+                x = acceleration.x;
+                y = acceleration.y;
+                z = acceleration.z;
+                var speed = Math.abs(x + y + z - last_x - last_y - last_z) / diffTime * 10000;
+                if (speed > SHAKE_THRESHOLD) {
+                    getAwards();
+                    last_update = curTime;
+                    $(".shake-band").addClass("shake-animation");
+                    setTimeout(function(){
+                        $(".shake-band").removeClass("shake-animation");
+                    }, 1000);
+                    document.getElementById("musicBox").load();
+                    document.getElementById("musicBox").play();
+                    last_x = x;
+                    last_y = y;
+                    last_z = z;
+
+                }
+            }
+        }
+
+        function getAwards() {
+            $.ajax({
+                type : "GET",
+                url : "index.php",
+                success : function(result) {
+                    if(result) {
+                        $(".awards").html(result);
+                        $(".awards").toggle("1000");
+                        window.removeEventListener('devicemotion', deviceMotionHandler, false);
+                    } else {
+                        $(".not-awards").toggle("1000");
+                        setTimeout(function(){
+                            $(".not-awards").toggle("1000");
+                        }, 1000)
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

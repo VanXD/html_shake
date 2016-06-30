@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+
+
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>
+    $.ajax({
+        type : "get",
+        url : "http://xdshake.applinzi.com/setAwards.php",
+        async : false,
+        data : {
+            awards : ["特大奖", "一等奖"],
+            amount : [1, 2]
+        },
+        success : function(result) {
+            alert(result);
+        }
+    });
+</script>
+</body>
+</html>
